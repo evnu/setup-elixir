@@ -33,7 +33,11 @@ async function main() {
   await installElixir(elixirVersion, otpMajor)
   console.log(`##[endgroup]`)
 
-  process.env.PATH = `/tmp/.setup-elixir/elixir/bin:${process.env.PATH}`
+  if (process.platform === 'win32') {
+      process.env.PATH = `C:\\ProgramData\\chocolatey\\lib\\Elixir\\bin:${process.env.PATH}`
+  } else {
+      process.env.PATH = `/tmp/.setup-elixir/elixir/bin:${process.env.PATH}`
+  }
 
   if (installRebar) await exec('mix local.rebar --force')
   if (installHex) await exec('mix local.hex --force')
@@ -43,9 +47,9 @@ async function main() {
 }
 
 function checkPlatform() {
-  if (process.platform !== 'linux')
+  if (process.platform !== 'linux' && process.platform !== 'win32')
     throw new Error(
-      '@actions/setup-elixir only supports Ubuntu Linux at this time'
+      '@actions/setup-elixir only supports Ubuntu Linux and Windows at this time'
     )
 }
 

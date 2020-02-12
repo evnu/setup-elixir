@@ -11,9 +11,18 @@ module.exports = {installElixir, installOTP}
  * @param {string} otpMajor
  */
 async function installElixir(version, otpMajor) {
+  const otpString = otpMajor ? `-otp-${otpMajor}` : ''
   if (process.platform === 'linux') {
-    const otpString = otpMajor ? `-otp-${otpMajor}` : ''
     await exec(path.join(__dirname, 'install-elixir'), [version, otpString])
+
+    return
+  }
+
+  if (process.platform === 'win32') {
+    // FIXME version
+    await exec('choco.exe', ['install', 'elixir'])
+
+    return
   }
 }
 
@@ -28,7 +37,12 @@ async function installOTP(version) {
     return
   }
 
+  if (process.platform === 'win32') {
+    // OTP is installed via elixir
+    return
+  }
+
   throw new Error(
-    '@actions/setup-elixir only supports Ubuntu Linux at this time'
+    '@actions/setup-elixir only supports Ubuntu Linux and Windows at this time'
   )
 }
